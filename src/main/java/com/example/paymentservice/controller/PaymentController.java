@@ -1,26 +1,26 @@
 package com.example.paymentservice.controller;
 
-import com.example.paymentservice.model.Payment;
+import com.example.paymentservice.dto.PaymentRequest;
+import com.example.paymentservice.dto.PaymentResponse;
 import com.example.paymentservice.service.PaymentService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/v1/payments")
+@RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService service;
-
-    public PaymentController(PaymentService service) {
-        this.service = service;
-    }
+    private final PaymentService paymentService;
 
     @PostMapping
-    public Payment create(@RequestBody Payment payment) {
-        return service.createPayment(payment);
+    public PaymentResponse createPayment(@Valid @RequestBody PaymentRequest request) {
+        return paymentService.createPayment(request);
     }
 
-    @GetMapping("/{id}")
-    public Payment get(@PathVariable String id) {
-        return service.getPayment(id);
+    @GetMapping("/{paymentId}")
+    public PaymentResponse getPayment(@PathVariable String paymentId) {
+        return paymentService.getPayment(paymentId);
     }
 }

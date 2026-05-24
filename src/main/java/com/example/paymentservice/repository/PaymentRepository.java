@@ -4,7 +4,6 @@ import com.example.paymentservice.model.Payment;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -17,7 +16,7 @@ public class PaymentRepository {
         return payment;
     }
 
-    public Optional<Payment> findById(String paymentId) {
-        return Optional.ofNullable(store.get(paymentId));
+    public Payment findById(String paymentId) {
+        return store.get(paymentId);
     }
 }
