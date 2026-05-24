@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 @Data
 public class PaymentRequest {
 
-    @NotNull(message = "Amount cannot be null")
-    @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
+    @NotNull(message = "Amount is required")
+    @DecimalMin(value = "0.01", message = "Amount should be greater than zero")
     private BigDecimal amount;
 
     @NotBlank(message = "Currency is required")
