@@ -10,16 +10,16 @@ import java.math.BigDecimal;
 @Data
 public class PaymentRequest {
 
-    @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", message = "Amount should be greater than zero")
+    @NotNull
+    @DecimalMin("0.01")
     private BigDecimal amount;
 
-    @NotBlank(message = "Currency is required")
+    @NotBlank
     private String currency;
 
-    @NotBlank(message = "Payer ID is required")
+    @NotBlank
     private String payerId;
 
-    @NotBlank(message = "Payee ID is required")
+    @NotBlank
     private String payeeId;
 }

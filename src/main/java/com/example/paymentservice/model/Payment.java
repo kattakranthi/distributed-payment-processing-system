@@ -1,28 +1,31 @@
 package com.example.paymentservice.model;
 
-import java.math.BigDecimal;
+import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Data
 public class Payment {
 
     private String paymentId;
-    private String userId;
     private BigDecimal amount;
     private String currency;
+    private String payerId;
+    private String payeeId;
     private PaymentStatus status;
+    private LocalDateTime createdAt;
 
-    // getters & setters
-    public String getPaymentId() { return paymentId; }
-    public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
-
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
-
-    public String getCurrency() { return currency; }
-    public void setCurrency(String currency) { this.currency = currency; }
-
-    public PaymentStatus getStatus() { return status; }
-    public void setStatus(PaymentStatus status) { this.status = status; }
+    public static Payment create(BigDecimal amount, String currency, String payerId, String payeeId) {
+        Payment payment = new Payment();
+        payment.setPaymentId(UUID.randomUUID().toString());
+        payment.setAmount(amount);
+        payment.setCurrency(currency);
+        payment.setPayerId(payerId);
+        payment.setPayeeId(payeeId);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setCreatedAt(LocalDateTime.now());
+        return payment;
+    }
 }
