@@ -1,0 +1,1 @@
+Introduce persistence layer using PostgreSQL and idempotency support to prevent duplicate payment creation during retries or network failures.

@@ -1,22 +1,12 @@
 package com.example.paymentservice.repository;
 
-import com.example.paymentservice.model.Payment;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.example.paymentservice.entity.PaymentEntity;
+import java.util.Optional;
 
-@Repository
-public class PaymentRepository {
+public interface PaymentRepository
+        extends JpaRepository<PaymentEntity, String> {
 
-    private final Map<String, Payment> store = new ConcurrentHashMap<>();
-
-    public Payment save(Payment payment) {
-        store.put(payment.getPaymentId(), payment);
-        return payment;
-    }
-
-    public Payment findById(String paymentId) {
-        return store.get(paymentId);
-    }
+    Optional<PaymentEntity> findByIdempotencyKey(String key);
 }

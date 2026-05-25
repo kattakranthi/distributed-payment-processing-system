@@ -4,7 +4,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
+import jakarta.persistence.Column;
 import java.math.BigDecimal;
 
 @Data
@@ -22,4 +22,7 @@ public class PaymentRequest {
 
     @NotBlank
     private String payeeId;
+
+    @Column(unique = true)
+    private String idempotencyKey;
 }
