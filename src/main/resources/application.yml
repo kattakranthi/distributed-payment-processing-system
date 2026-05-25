@@ -1,9 +1,24 @@
 server:
   port: 8080
 
+logging:
+  level:
+    org.springframework.boot.autoconfigure: DEBUG
+
 spring:
   application:
     name: payment-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/paymentdb
+    username: postgres
+    password: guest
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 
 springdoc:
   swagger-ui:
