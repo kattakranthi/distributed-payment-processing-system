@@ -17,4 +17,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePaymentNotFound(PaymentNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(
+            InvalidPaymentStatusException.class)
+    public ResponseEntity<String>
+    handleInvalidStatus(
+            InvalidPaymentStatusException ex) {
+
+        return ResponseEntity.badRequest()
+                .body(ex.getMessage());
+    }
 }
