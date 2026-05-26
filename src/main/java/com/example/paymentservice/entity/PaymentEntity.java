@@ -27,7 +27,7 @@ public class PaymentEntity {
     @Id
     private String paymentId;
 
-    private BigDecimal amount;
+    private Double amount;
 
     private String currency;
 
@@ -37,8 +37,13 @@ public class PaymentEntity {
 
     private String idempotencyKey;
 
+
+    private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    private LocalDateTime processedAt;
 }

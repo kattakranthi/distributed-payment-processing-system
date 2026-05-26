@@ -12,7 +12,7 @@ public class PaymentRequest {
 
     @NotNull
     @DecimalMin("0.01")
-    private BigDecimal amount;
+    private Double amount;
 
     @NotBlank
     private String currency;
