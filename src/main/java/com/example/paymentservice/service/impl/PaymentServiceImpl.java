@@ -12,7 +12,8 @@ import com.example.paymentservice.service.IdempotencyService;
 import com.example.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import com.example.paymentservice.event.PaymentCreatedEvent;
+import com.example.paymentservice.producer.PaymentEventProducer;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +24,9 @@ public class PaymentServiceImpl
         implements PaymentService {
 
     private final PaymentRepository repository;
+    private final PaymentEventProducer
+            paymentEventProducer;
+
 
     private final IdempotencyService
             idempotencyService;
@@ -68,7 +72,27 @@ public class PaymentServiceImpl
 
         repository.save(payment);
 
-        return mapToResponse(payment);
+        PaymentCreatedEvent event =
+                PaymentCreatedEvent
+                        .builder()
+                        .paymentId(
+                                payment.getPaymentId())
+                        .amount(
+                                payment.getAmount())
+                        .currency(
+                                payment.getCurrency())
+                        .payerId(
+                                payment.getPayerId())
+                        .payeeId(
+                                payment.getPayeeId())
+                        .build();
+
+        paymentEventProducer
+                .publishPaymentEvent(
+                        event);
+
+        return mapToResponse(
+                payment);
     }
 
     @Override
