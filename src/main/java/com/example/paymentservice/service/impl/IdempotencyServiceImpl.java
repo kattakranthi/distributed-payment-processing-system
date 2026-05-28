@@ -12,10 +12,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IdempotencyServiceImpl implements IdempotencyService {
 
-    private final PaymentRepository repository;
+    private final PaymentRepository paymentRepository;
 
     @Override
-    public Optional<PaymentEntity> getExistingPayment(String key) {
-        return repository.findByIdempotencyKey(key);
+    public Optional<PaymentEntity> getExistingPayment(String idempotencyKey) {
+        return paymentRepository.findByIdempotencyKey(idempotencyKey);
     }
 }

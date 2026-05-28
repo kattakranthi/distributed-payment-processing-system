@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface IdempotencyService {
 
-    Optional<PaymentEntity> getExistingPayment(String key);
+    Optional<PaymentEntity> getExistingPayment(String idempotencyKey);
 }

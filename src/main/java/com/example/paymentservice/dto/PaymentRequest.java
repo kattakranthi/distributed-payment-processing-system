@@ -23,6 +23,8 @@ public class PaymentRequest {
     @NotBlank
     private String payeeId;
 
-    @Column(unique = true)
+    @NotBlank(message =
+            "Idempotency key is required")
     private String idempotencyKey;
 }
+

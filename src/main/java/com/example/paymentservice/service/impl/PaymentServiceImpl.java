@@ -1,5 +1,5 @@
 package com.example.paymentservice.service.impl;
-
+import lombok.extern.slf4j.Slf4j;
 import com.example.paymentservice.dto.PaymentRequest;
 import com.example.paymentservice.dto.PaymentResponse;
 import com.example.paymentservice.dto.PaymentStatusUpdateRequest;
@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentServiceImpl
         implements PaymentService {
@@ -31,6 +32,7 @@ public class PaymentServiceImpl
     private final IdempotencyService
             idempotencyService;
 
+
     @Override
     public PaymentResponse createPayment(
             PaymentRequest request) {
@@ -42,6 +44,11 @@ public class PaymentServiceImpl
                                 request.getIdempotencyKey());
 
         if (existingPayment.isPresent()) {
+
+            log.info(
+                    "Duplicate payment request detected "
+                            + "for idempotency key: {}",
+                    request.getIdempotencyKey());
 
             return mapToResponse(
                     existingPayment.get());
