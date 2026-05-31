@@ -1,8 +1,8 @@
 package com.example.paymentservice.producer;
 
 import com.example.paymentservice.config.KafkaTopics;
-import com.example.paymentservice.event.PaymentCreatedEvent;
-import com.example.paymentservice.event.PaymentRetryEvent;
+import com.example.events.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -54,6 +54,14 @@ public class PaymentEventProducer {
                 KafkaTopics.PAYMENT_DLQ_TOPIC,
                 retryEvent.getEvent().getPaymentId(),
                 retryEvent
+        );
+    }
+
+    public void publishPaymentCompleted(PaymentCompletedEvent event) {
+        kafkaTemplate.send(
+                KafkaTopics.PAYMENT_COMPLETED_TOPIC,
+                event.getPaymentId(),
+                event
         );
     }
 }

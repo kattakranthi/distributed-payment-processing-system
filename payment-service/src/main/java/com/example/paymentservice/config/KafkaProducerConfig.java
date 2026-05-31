@@ -1,6 +1,5 @@
 package com.example.paymentservice.config;
 
-import com.example.paymentservice.event.PaymentCreatedEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.context.annotation.Bean;

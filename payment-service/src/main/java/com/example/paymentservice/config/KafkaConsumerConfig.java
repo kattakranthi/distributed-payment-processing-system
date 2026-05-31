@@ -1,6 +1,6 @@
 package com.example.paymentservice.config;
 
-import com.example.paymentservice.event.PaymentCreatedEvent;
+import com.example.events.PaymentCreatedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;

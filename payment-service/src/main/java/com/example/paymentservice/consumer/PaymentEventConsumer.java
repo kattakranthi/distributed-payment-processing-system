@@ -1,9 +1,10 @@
 package com.example.paymentservice.consumer;
 
+import com.example.events.PaymentCompletedEvent;
 import com.example.paymentservice.config.KafkaTopics;
 import com.example.paymentservice.entity.PaymentEntity;
-import com.example.paymentservice.event.PaymentCreatedEvent;
-import com.example.paymentservice.event.PaymentRetryEvent;
+import com.example.events.PaymentCreatedEvent;
+import com.example.events.PaymentRetryEvent;
 import com.example.paymentservice.model.PaymentStatus;
 import com.example.paymentservice.producer.PaymentEventProducer;
 import com.example.paymentservice.repository.PaymentRepository;
@@ -34,8 +35,11 @@ public class PaymentEventConsumer {
         System.out.println("Received payment event: " + event.getPaymentId());
 
         try {
+
             PaymentEntity payment = paymentRepository.findById(event.getPaymentId())
-                    .orElseThrow();
+                    .orElseThrow(() ->
+                            new RuntimeException("Payment not found: " + event.getPaymentId())
+                    );
 
             payment.setStatus(PaymentStatus.PROCESSING);
             paymentRepository.save(payment);
@@ -50,6 +54,17 @@ public class PaymentEventConsumer {
             paymentRepository.save(payment);
 
             System.out.println("Payment completed: " + payment.getPaymentId());
+
+            PaymentCompletedEvent completedEvent =
+                    new PaymentCompletedEvent(
+                            payment.getPaymentId(),
+                            payment.getAmount(),
+                            payment.getStatus().name(),
+                            payment.getPayerId(),
+                            payment.getPayeeId()
+                    );
+
+            paymentProducer.publishPaymentCompleted(completedEvent);
 
         } catch (Exception ex) {
 
@@ -102,11 +117,15 @@ public class PaymentEventConsumer {
     private void process(PaymentCreatedEvent event) {
 
         PaymentEntity entity = paymentRepository.findById(event.getPaymentId())
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new RuntimeException("Payment not found: " + event.getPaymentId())
+                );
 
         entity.setStatus(PaymentStatus.SUCCESS);
         entity.setUpdatedAt(LocalDateTime.now());
 
         paymentRepository.save(entity);
     }
+
+
 }

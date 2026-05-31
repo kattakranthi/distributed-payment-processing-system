@@ -12,7 +12,7 @@ import com.example.paymentservice.service.IdempotencyService;
 import com.example.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.example.paymentservice.event.PaymentCreatedEvent;
+import com.example.events.PaymentCreatedEvent;
 import com.example.paymentservice.producer.PaymentEventProducer;
 import java.time.LocalDateTime;
 import java.util.Optional;
