@@ -12,7 +12,7 @@ public class PaymentResponse {
 
     private String paymentId;
 
-    private Double amount;
+    private BigDecimal amount;
 
     private String currency;
 

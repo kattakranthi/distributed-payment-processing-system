@@ -95,7 +95,7 @@ public class PaymentServiceImpl
                         .build();
 
         paymentEventProducer
-                .publishPaymentEvent(
+                .sendPaymentEvent(
                         event);
 
         return mapToResponse(

@@ -18,7 +18,7 @@ public class KafkaProducerConfig {
 
     @Bean
     public ProducerFactory<String,
-            PaymentCreatedEvent>
+            Object>
     producerFactory() {
 
         Map<String, Object> config =
@@ -42,11 +42,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String,
-            PaymentCreatedEvent>
-    kafkaTemplate() {
-
-        return new KafkaTemplate<>(
-                producerFactory());
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
     }
 }
