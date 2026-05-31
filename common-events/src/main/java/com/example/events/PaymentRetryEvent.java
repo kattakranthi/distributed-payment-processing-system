@@ -1,4 +1,4 @@
-package com.example.paymentservice.event;
+package com.example.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

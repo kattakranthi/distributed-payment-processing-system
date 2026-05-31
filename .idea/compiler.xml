@@ -7,13 +7,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="distributed-payment-processing-system" />
+        <module name="payment-service (1)" />
+        <module name="common-events" />
+        <module name="payment-service (2)" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="distributed-payment-processing-system" options="-parameters" />
+      <module name="distributed-payment-processing-system" options="" />
     </option>
   </component>
 </project>
