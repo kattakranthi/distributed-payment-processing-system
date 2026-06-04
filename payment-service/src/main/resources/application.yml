@@ -9,7 +9,8 @@ spring:
   application:
     name: payment-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/paymentdb
+    url: jdbc:postgresql://postgres:5432/paymentdb
+
     username: postgres
     password: guest
     driver-class-name: org.postgresql.Driver
@@ -18,8 +19,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
 
     consumer:
       group-id: payment-group
@@ -28,7 +30,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
 
 springdoc:
   swagger-ui:

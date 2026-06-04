@@ -8,6 +8,11 @@
     <artifactId>distributed-payment-processing-system</artifactId>
     <version>1.0.0</version>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.2</version>
+    </parent>
     <!-- THIS IS CRITICAL -->
     <packaging>pom</packaging>
 
