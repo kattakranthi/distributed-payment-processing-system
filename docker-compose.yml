@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: guest
+
+    ports:
+      - "5432:5432"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+    ports:
+      - "2181:2181"
+
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+
+    depends_on:
+      - zookeeper
+
+    ports:
+      - "9092:9092"
+
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  payment-service:
+    build:
+      context: ./payment-service
+
+    container_name: payment-service
+
+    depends_on:
+      - postgres
+      - kafka
+
+    ports:
+      - "8080:8080"
+
+  notification-service:
+    build:
+      context: ./notification-service
+
+    container_name: notification-service
+
+    depends_on:
+      - kafka
+
+    ports:
+      - "8081:8081"
