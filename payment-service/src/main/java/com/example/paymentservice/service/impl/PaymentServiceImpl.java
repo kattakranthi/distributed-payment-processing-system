@@ -78,6 +78,7 @@ public class PaymentServiceImpl
                         .build();
 
         repository.save(payment);
+        System.out.print("save to database ");
 
         PaymentCreatedEvent event =
                 PaymentCreatedEvent
