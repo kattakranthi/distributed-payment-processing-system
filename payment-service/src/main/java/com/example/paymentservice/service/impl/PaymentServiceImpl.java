@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.example.events.PaymentCreatedEvent;
 import com.example.paymentservice.producer.PaymentEventProducer;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,8 +59,8 @@ public class PaymentServiceImpl
         PaymentEntity payment =
                 PaymentEntity.builder()
                         .paymentId(
-                                UUID.randomUUID()
-                                        .toString())
+                                UUID.randomUUID().toString()
+                                        )
                         .amount(
                                 request.getAmount())
                         .currency(
@@ -101,6 +103,20 @@ public class PaymentServiceImpl
 
         return mapToResponse(
                 payment);
+    }
+
+    @Override
+    public List<PaymentResponse> getPayments() {
+
+        List<PaymentEntity> payments = repository.findAll();
+
+        if (payments == null || payments.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return payments.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -165,7 +181,7 @@ public class PaymentServiceImpl
 
         return PaymentResponse.builder()
                 .paymentId(
-                        payment.getPaymentId())
+                        payment.getPaymentId().toString())
                 .amount(
                         payment.getAmount())
                 .currency(

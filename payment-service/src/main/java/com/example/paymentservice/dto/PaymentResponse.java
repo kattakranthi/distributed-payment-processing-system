@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Builder

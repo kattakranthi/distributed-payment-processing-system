@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
@@ -40,5 +42,10 @@ public class PaymentController {
                         .updatePaymentStatus(
                                 paymentId,
                                 request));
+    }
+
+    @GetMapping("/allpayments")
+    public List<PaymentResponse> getPayments() {
+        return paymentService.getPayments();
     }
 }
