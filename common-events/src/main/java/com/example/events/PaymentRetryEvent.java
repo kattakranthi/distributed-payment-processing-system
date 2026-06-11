@@ -11,4 +11,6 @@ public class PaymentRetryEvent {
 
     private PaymentCreatedEvent event;
     private int retryCount;
+    String lastError;
+    String errorType;
 }

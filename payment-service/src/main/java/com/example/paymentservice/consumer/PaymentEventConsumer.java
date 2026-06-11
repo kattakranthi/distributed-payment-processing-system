@@ -1,19 +1,21 @@
 package com.example.paymentservice.consumer;
 
 import com.example.events.PaymentCompletedEvent;
-import com.example.paymentservice.config.KafkaTopics;
-import com.example.paymentservice.entity.PaymentEntity;
 import com.example.events.PaymentCreatedEvent;
 import com.example.events.PaymentRetryEvent;
+import com.example.paymentservice.config.KafkaTopics;
+import com.example.paymentservice.entity.PaymentEntity;
 import com.example.paymentservice.model.PaymentStatus;
 import com.example.paymentservice.producer.PaymentEventProducer;
 import com.example.paymentservice.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentEventConsumer {
@@ -24,7 +26,7 @@ public class PaymentEventConsumer {
     private final PaymentEventProducer paymentProducer;
 
     // =========================
-    // MAIN PAYMENT EVENT CONSUMER
+    // MAIN PAYMENT CONSUMER
     // =========================
     @KafkaListener(
             topics = KafkaTopics.PAYMENT_CREATED_TOPIC,
@@ -32,11 +34,11 @@ public class PaymentEventConsumer {
     )
     public void consumePaymentCreated(PaymentCreatedEvent event) {
 
-        System.out.println("Received payment event: " + event.getPaymentId());
+        log.info("Received payment event paymentId={}", event.getPaymentId());
 
         try {
 
-            PaymentEntity payment = paymentRepository.findById(event.getPaymentId())
+            PaymentEntity payment = paymentRepository.findById(event.getPaymentId().toString())
                     .orElseThrow(() ->
                             new RuntimeException("Payment not found: " + event.getPaymentId())
                     );
@@ -44,7 +46,7 @@ public class PaymentEventConsumer {
             payment.setStatus(PaymentStatus.PROCESSING);
             paymentRepository.save(payment);
 
-            // simulate processing (replace with real logic later)
+            // simulate processing
             Thread.sleep(1000);
 
             payment.setStatus(PaymentStatus.SUCCESS);
@@ -53,11 +55,11 @@ public class PaymentEventConsumer {
 
             paymentRepository.save(payment);
 
-            System.out.println("Payment completed: " + payment.getPaymentId());
+            log.info("Payment completed paymentId={}", payment.getPaymentId());
 
             PaymentCompletedEvent completedEvent =
                     new PaymentCompletedEvent(
-                            payment.getPaymentId(),
+                            payment.getPaymentId().toString(),
                             payment.getAmount(),
                             payment.getStatus().name(),
                             payment.getPayerId(),
@@ -68,10 +70,17 @@ public class PaymentEventConsumer {
 
         } catch (Exception ex) {
 
-            System.out.println("Processing failed: " + ex.getMessage());
+            log.error("Processing failed paymentId={} error={}",
+                    event.getPaymentId(),
+                    ex.getMessage());
 
             PaymentRetryEvent retryEvent =
-                    new PaymentRetryEvent(event, 1);
+                    new PaymentRetryEvent(
+                            event,
+                            1,
+                            ex.getClass().getSimpleName(),
+                            ex.getMessage()
+                    );
 
             paymentProducer.sendToRetry(retryEvent);
         }
@@ -87,26 +96,47 @@ public class PaymentEventConsumer {
     public void consumeRetry(PaymentRetryEvent retryEvent) {
 
         int retryCount = retryEvent.getRetryCount();
+        PaymentCreatedEvent event = retryEvent.getEvent();
 
-        System.out.println("Retry attempt: " + retryCount);
+        log.info("Retry attempt={} paymentId={}",
+                retryCount,
+                event.getPaymentId());
 
         try {
-            PaymentCreatedEvent originalEvent = retryEvent.getEvent();
-            process(originalEvent);
+
+            // 🔐 FIXED: correct Optional handling
+            if (paymentRepository.findByIdempotencyKey(event.getIdempotencyKey()).isPresent()) {
+                log.info("Duplicate payment ignored idempotencyKey={}",
+                        event.getIdempotencyKey());
+                return;
+            }
+
+            process(event);
+
+            log.info("Retry success paymentId={}", event.getPaymentId());
 
         } catch (Exception ex) {
 
             int nextRetry = retryCount + 1;
 
-            PaymentRetryEvent next = new PaymentRetryEvent(
-                    retryEvent.getEvent(),
-                    nextRetry
+            log.error("Retry failed paymentId={} attempt={} error={}",
+                    event.getPaymentId(),
+                    retryCount,
+                    ex.getMessage());
+
+            PaymentRetryEvent nextEvent = new PaymentRetryEvent(
+                    event,
+                    nextRetry,
+                    ex.getClass().getSimpleName(),
+                    ex.getMessage()
             );
 
             if (nextRetry <= MAX_RETRY) {
-                paymentProducer.sendToRetry(next);
+                paymentProducer.sendToRetry(nextEvent);
             } else {
-                paymentProducer.sendToDLQ(next, ex.getMessage());
+                paymentProducer.sendToDLQ(
+                        buildDLQEvent(nextEvent)
+                );
             }
         }
     }
@@ -116,7 +146,7 @@ public class PaymentEventConsumer {
     // =========================
     private void process(PaymentCreatedEvent event) {
 
-        PaymentEntity entity = paymentRepository.findById(event.getPaymentId())
+        PaymentEntity entity = paymentRepository.findById(event.getPaymentId().toString())
                 .orElseThrow(() ->
                         new RuntimeException("Payment not found: " + event.getPaymentId())
                 );
@@ -127,5 +157,15 @@ public class PaymentEventConsumer {
         paymentRepository.save(entity);
     }
 
+    // =========================
+    // DLQ BUILDER
+    // =========================
+    private com.example.events.PaymentDLQEvent buildDLQEvent(PaymentRetryEvent retryEvent) {
 
+        log.error("Sending to DLQ paymentId={} retryCount={}",
+                retryEvent.getEvent().getPaymentId(),
+                retryEvent.getRetryCount());
+
+        return new com.example.events.PaymentDLQEvent(retryEvent);
+    }
 }
