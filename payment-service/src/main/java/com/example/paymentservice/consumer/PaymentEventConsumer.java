@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.MDC;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -24,6 +24,8 @@ public class PaymentEventConsumer {
 
     private final PaymentRepository paymentRepository;
     private final PaymentEventProducer paymentProducer;
+
+
 
     // =========================
     // MAIN PAYMENT CONSUMER
@@ -42,6 +44,10 @@ public class PaymentEventConsumer {
                     .orElseThrow(() ->
                             new RuntimeException("Payment not found: " + event.getPaymentId())
                     );
+            MDC.put("correlationId", event.getCorrelationId());
+
+            log.info("Processing payment event {}", event.getPaymentId());
+            log.info("TEST LOG");
 
             payment.setStatus(PaymentStatus.PROCESSING);
             paymentRepository.save(payment);
@@ -83,6 +89,8 @@ public class PaymentEventConsumer {
                     );
 
             paymentProducer.sendToRetry(retryEvent);
+        } finally {
+            MDC.clear();
         }
     }
 
