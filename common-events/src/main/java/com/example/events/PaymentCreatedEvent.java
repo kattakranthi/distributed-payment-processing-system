@@ -22,4 +22,5 @@ public class PaymentCreatedEvent {
     private BigDecimal amount;
     private String currency;
     private String idempotencyKey;
+    private String correlationId;
 }

@@ -2,9 +2,8 @@ server:
   port: 8080
 
 logging:
-  level:
-    org.springframework.boot.autoconfigure: DEBUG
-
+  pattern:
+    console: "[CORR=%X{correlationId}] %d %-5level %logger - %msg%n"
 spring:
   application:
     name: payment-service

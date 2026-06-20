@@ -2,7 +2,7 @@ package com.example.paymentservice.producer;
 
 import com.example.paymentservice.config.KafkaTopics;
 import com.example.events.*;
-
+import org.slf4j.MDC;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +29,13 @@ public class PaymentEventProducer {
                 event
         );
 
+        String correlationId =
+                MDC.get("correlationId");
+
+        log.info(
+                "Publishing payment event with correlationId={}",
+                correlationId
+        );
         log.info("Payment event published paymentId={}", event.getPaymentId());
     }
 

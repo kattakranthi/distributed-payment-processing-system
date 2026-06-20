@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import org.slf4j.MDC;
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -81,7 +81,8 @@ public class PaymentServiceImpl
 
         repository.save(payment);
         System.out.print("save to database ");
-
+        String correlationId =
+                MDC.get("correlationId");
         PaymentCreatedEvent event =
                 PaymentCreatedEvent
                         .builder()
@@ -95,6 +96,7 @@ public class PaymentServiceImpl
                                 payment.getPayerId())
                         .payeeId(
                                 payment.getPayeeId())
+                        .correlationId(correlationId)
                         .build();
 
         paymentEventProducer
